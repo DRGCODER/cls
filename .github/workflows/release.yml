@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Rust
-        uses: dtolnay/rust-action@stable
+        uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.target }}
 
@@ -41,12 +41,13 @@ jobs:
         run: cargo build --release --target ${{ matrix.target }}
 
       - name: Rename binary (Unix)
-        if: matrix.os != 'windows-latest'
+        if: runner.os != 'Windows'
         run: mv target/${{ matrix.target }}/release/cls ${{ matrix.name }}
 
       - name: Rename binary (Windows)
-        if: matrix.os == 'windows-latest'
-        run: mv target/${{ matrix.target }}/release/cls.exe ${{ matrix.name }}
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Move-Item -Path target/${{ matrix.target }}/release/cls.exe -Destination ${{ matrix.name }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
